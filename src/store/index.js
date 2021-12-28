@@ -1,12 +1,10 @@
 import { createStore } from 'vuex'
+import loading from './loading'
+import modal from './modal'
 
 export default createStore({
-  state: {
-  },
-  mutations: {
-  },
-  actions: {
-  },
   modules: {
+    loading,
+    modal
   }
 })

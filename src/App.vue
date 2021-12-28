@@ -1,10 +1,21 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </div>
+  <Loading v-if="isLoading" />
   <router-view/>
 </template>
+
+<script>
+import { mapState } from 'vuex'
+import Loading from '@/components/Loading.vue'
+
+export default {
+  components: {
+    Loading
+  },
+  computed: {
+    ...mapState('loading', ['isLoading'])
+  }
+}
+</script>
 
 <style lang="scss">
 #app {
