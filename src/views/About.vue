@@ -197,14 +197,14 @@ export default {
     justify-content: left;
     align-items: center;
     opacity: 0.3;
-    &:active {
-      opacity: 1;
-    }
     img {
       width: 25px;
       height: 25px;
       margin-right: 15px;
     }
+  }
+  .active {
+    opacity: 1;
   }
   .date {
     width: 50%;

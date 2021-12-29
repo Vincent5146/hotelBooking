@@ -15,7 +15,7 @@
             <span><i class="fas fa-envelope"></i></span>whitespace@whitespace.com.tw
           </div>
           <div>
-            <span><i class="fas fa-home"></i></span>台北市羅斯福路十段30號
+            <!-- <span><i class="fas fa-home"></i></span>台北市羅斯福路十段30號 -->
           </div>
         </div>
       </div>
