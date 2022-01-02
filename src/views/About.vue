@@ -1,7 +1,7 @@
 <template>
   <div class="container" v-for="item in room" :key="item.id">
     <div class="pictures">
-      <div class="logo" @click="$router.push({name: 'Home'})"></div>
+      <div class="logo" @click="$router.push({ name: 'Home' })"></div>
       <div
         class="pic1"
         :style="{ backgroundImage: `url(${item.imageUrl[2]})` }"
@@ -110,7 +110,22 @@
           <h4>NT.{{ item.holidayPrice }}</h4>
           <h3>假日(五~日)</h3>
         </div>
-        <div class="calender"></div>
+        <div class="calender">
+          <v-date-picker
+            :modelValue="range"
+            @drag="(val) => handleSelect(val)"
+            is-range
+            :disabled-dates="[
+              new Date(2022, 0, 12),
+              new Date(2022, 0, 13),
+              new Date(2022, 0, 14),
+              new Date(2022, 0, 19),
+            ]"
+          />
+          <p>{{ range }}</p>
+          <button>Book</button>
+          <!-- <v-calendar /> -->
+        </div>
       </div>
     </div>
   </div>
@@ -123,11 +138,23 @@ import { getInformation } from '../api/index'
 export default {
   data () {
     return {
-      room: []
+      room: [],
+      range: {
+        start: new Date(),
+        end: new Date()
+      }
     }
   },
   methods: {
-    ...mapActions('loading', ['handleLoading'])
+    ...mapActions('loading', ['handleLoading']),
+    handleSelect (val) {
+      console.log('val', val)
+      const { start, end } = val
+      if (new Date(start) === new Date(end)) {
+        this.range = {}
+        console.log('----')
+      }
+    }
   },
   async mounted () {
     try {

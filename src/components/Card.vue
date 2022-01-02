@@ -8,7 +8,7 @@
     <div class="roomInfo">
       <h2>{{ card.name }}</h2>
       <div class="prices">
-        <h3>單人房</h3>
+        <h3>{{ card.name }}</h3>
         <h1>
           {{ card.normalDayPrice }}
           <span class="wday">平日</span>

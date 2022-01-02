@@ -29,7 +29,12 @@
       <div class="roomList">
         <ul v-if="rooms.length > 0">
           <li v-for="room in rooms" :key="room.id">
-            <Card :card="room" />
+            <Card
+              :card="room"
+              @card:click="
+                $router.push({ name: 'About', params: { room_id: room.id } })
+              "
+            />
           </li>
         </ul>
       </div>
@@ -75,7 +80,7 @@ export default {
 <style lang="scss" scoped>
 .container {
   width: 100%;
-  // min-height: 100vh;
+  max-width: 1334px;
   margin: 0 auto;
   position: relative;
 }
@@ -136,7 +141,7 @@ export default {
   position: relative;
   top: -200px;
   ul {
-    margin: 0 50px;
+    margin: 0 20px;
     display: flex;
     align-items: center;
     justify-content: center;
