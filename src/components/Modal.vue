@@ -1,12 +1,22 @@
 <template>
   <div class="modal">
-    <div class="modal-mask"></div>
+    <div class="modal-mask" @click="handleModal(null)"></div>
     <div class="modal-content">
 
       <slot></slot>
     </div>
   </div>
 </template>
+
+<script>
+import { mapActions } from 'vuex'
+
+export default {
+  methods: {
+    ...mapActions('modal', ['handleModal'])
+  }
+}
+</script>
 
 <style lang="scss" scoped>
 @import "../styles/_mixins.scss";

@@ -21,12 +21,13 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scope>
 .success {
   padding: 40px;
   text-align: left;
   margin-bottom: 20px;
   h1 {
+    font-weight: bold;
     font-size: 24px;
     color: #000000;
     letter-spacing: 2.51px;
