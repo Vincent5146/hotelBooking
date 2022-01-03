@@ -1,14 +1,20 @@
 <template>
   <div class="container" v-for="item in room" :key="item.id">
     <div class="pictures">
-      <div class="logo"></div>
-      <div class="pic1" :style="{ backgroundImage: `url(${item.imageUrl[2]})` }">
-      </div>
+      <vue-easy-lightbox
+            scrollDisabled
+            escDisabled
+            moveDisabled
+            :visible="visible"
+            :imgs="item.imageUrl"
+            :index="index"
+            @hide="handleHide"
+          ></vue-easy-lightbox>
+      <div class="logo" @click="$router.push({ name: 'Home' })"></div>
+      <div class="pic1" :style="{ backgroundImage: `url(${item.imageUrl[2]})` }" @click="showMultiple"></div>
       <div>
-        <div class="pic2" :style="{ backgroundImage: `url(${item.imageUrl[1]})` }">
-        </div>
-        <div class="pic3" :style="{ backgroundImage: `url(${item.imageUrl[0]})` }">
-        </div>
+        <div class="pic2" :style="{ backgroundImage: `url(${item.imageUrl[1]})` }" @click="showMultiple"></div>
+        <div class="pic3" :style="{ backgroundImage: `url(${item.imageUrl[0]})` }" @click="showMultiple"></div>
       </div>
     </div>
     <div class="information">
@@ -55,6 +61,18 @@
           <h3>假日(五~日)</h3>
         </div>
         <div class="calender">
+          <v-date-picker
+            style="width: 80%"
+            :modelValue="range"
+            @drag="(val) => handleSelect(val)"
+            is-range
+            :disabled-dates="[
+              new Date(booking[0]),
+              new Date(booking[1]),
+              new Date(booking[2])
+            ]"
+          />
+          <button @click="handleModal('ModalBooking')">預約時段</button>
         </div>
       </div>
     </div>
@@ -66,22 +84,55 @@ import { mapActions } from 'vuex'
 import { getInformation } from '../api/index'
 
 export default {
-  date () {
+  data () {
     return {
-      room: [
-        {}
-      ]
+      room: [],
+      imgs: '',
+      visible: false,
+      index: 0,
+      date: {},
+      range: {
+        start: new Date(),
+        end: new Date()
+      },
+      booking: {}
     }
   },
   methods: {
-    ...mapActions('loading', ['handleLoading'])
+    showMultiple () {
+      this.imgs = this.room
+
+      this.index = 0
+      this.show()
+    },
+    show () {
+      this.visible = true
+    },
+    handleHide () {
+      this.visible = false
+    },
+    handleSelect (val) {
+      const { start, end } = val
+      if (new Date(start) === new Date(end)) {
+        this.range = {}
+        console.log('----')
+      }
+    },
+    ...mapActions('loading', ['handleLoading']),
+    ...mapActions('modal', ['handleModal'])
   },
   async mounted () {
     try {
       this.handleLoading(true)
       const response = await getInformation(this.$route.params.room_id)
       this.room = response.data.room
-      console.log(this.room)
+      this.booking = response.data.booking
+      const copy = []
+      this.booking.forEach(function (item) {
+        copy.push(item.date)
+      })
+      this.booking = Object.assign({}, copy)
+      console.log(this.booking)
     } catch (error) {
       console.warn(error)
     } finally {
@@ -91,125 +142,128 @@ export default {
 }
 </script>
 
-<style lang="scss">
-  .container {
-    width: 1200px;
-    margin: 0 auto;
+<style lang="scss" scope>
+.container {
+  width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  .pictures {
     display: flex;
-    flex-direction: column;
-    position: relative;
-    .pictures {
-      display: flex;
-      box-shadow: 0px 5px 15px 0px #888888;
-      .logo {
-        background: url(../assets/index/logo_block.svg);
-        background-repeat: no-repeat;
-        position: absolute;
-        width: 168px;
-        height: 60px;
-        top: 40px;
-        left: 50px;
-      }
-      .pic1 {
-        height: 596px;
-        width: 860px;
-        background-size: cover;
-        background-repeat: no-repeat;
-      }
-      .pic2 {
-        height: 298px;
-        width: 340px;
-        background-position: center;
-        background-size: cover;
-      }
-      .pic3 {
-        height: 298px;
-        width: 340px;
-        background-position: center;
-        background-size: cover;
-      }
+    box-shadow: 0px 5px 15px 0px #888888;
+    .logo {
+      background: url(../assets/index/logo_block.svg);
+      background-repeat: no-repeat;
+      position: absolute;
+      width: 168px;
+      height: 60px;
+      top: 40px;
+      left: 50px;
     }
-    .information {
-      display: flex;
-      text-align: left;
-      padding: 50px;
-      .room{
-        width: 45%;
-        h1{
-          font-size: 36px;
-          color: #000000;
-          letter-spacing: 3.76px;
-          margin-top: 0;
-          margin-bottom: 40px;
-        }
-        h3 {
-          color: #000000;
-          letter-spacing: 1.46px;
-          line-height: 31px;
-          margin-bottom: 10px;
-        }
-        p {
-          font-size: 12px;
-          color: #000000;
-          letter-spacing: 1.25px;
-          text-align: justify;
-          line-height: 20px;
-          margin-bottom: 30px;
-        }
-        .timeBox {
-          display: flex;
-          .time {
-            width: 50%;
-            h2 {
-              font-size: 14px;
-              color: #000000;
-              letter-spacing: 1.46px;
-              margin-bottom: 7px;
-            }
-            h4 {
-              font-size: 21px;
-              color: #000000;
-              letter-spacing: 2.19px;
-              margin: 0;
-            }
+    .pic1 {
+      height: 596px;
+      width: 860px;
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+    .pic2 {
+      height: 298px;
+      width: 340px;
+      background-position: center;
+      background-size: cover;
+    }
+    .pic3 {
+      height: 298px;
+      width: 340px;
+      background-position: center;
+      background-size: cover;
+    }
+  }
+  .information {
+    display: flex;
+    justify-content: space-evenly;
+    text-align: left;
+    padding: 50px;
+    .room{
+      width: 45%;
+      h1{
+        font-size: 36px;
+        color: #000000;
+        letter-spacing: 3.76px;
+        margin-top: 0;
+        margin-bottom: 40px;
+      }
+      h3 {
+        color: #000000;
+        letter-spacing: 1.46px;
+        line-height: 31px;
+        margin-bottom: 10px;
+      }
+      p {
+        font-size: 12px;
+        color: #000000;
+        letter-spacing: 1.25px;
+        text-align: justify;
+        line-height: 20px;
+        margin-bottom: 30px;
+      }
+      .timeBox {
+        display: flex;
+        .time {
+          width: 50%;
+          h2 {
+            font-size: 14px;
+            color: #000000;
+            letter-spacing: 1.46px;
+            margin-bottom: 7px;
+          }
+          h4 {
+            font-size: 21px;
+            color: #000000;
+            letter-spacing: 2.19px;
+            margin: 0;
           }
         }
       }
     }
   }
-  .icons {
-    background: #d8d5d5;
-    display: flex;
-    flex-wrap: wrap;
-    margin-top: 30px;
-    padding: 25px 0 25px 25px;
-    align-items: center;
-    justify-content: center;
-  }
-  .fonts {
-    width: 33%;
-    margin-bottom: 20px;
-    font-family: NotoSansCJKtc-Light;
-    font-size: 12px;
-    color: #3A3A3A;
-    letter-spacing: 1.25px;
-    display: flex;
-    justify-content: left;
-    align-items: center;
-    opacity: 0.3;
-    img {
-      width: 25px;
-      height: 25px;
-      margin-right: 15px;
-    }
-  }
-  .active {
+}
+.icons {
+  background: #d8d5d5;
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 30px;
+  padding: 25px 0 25px 25px;
+  align-items: center;
+  justify-content: center;
+}
+.fonts {
+  width: 33%;
+  margin-bottom: 20px;
+  font-family: NotoSansCJKtc-Light;
+  font-size: 12px;
+  color: #3A3A3A;
+  letter-spacing: 1.25px;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  opacity: 0.3;
+  &.active {
     opacity: 1;
   }
-  .date {
-    width: 50%;
-    display: flex;
-    margin-left: 35px;
+  img {
+    width: 25px;
+    height: 25px;
+    margin-right: 15px;
+  }
+}
+.date {
+  width: 50%;
+  margin-left: 20px;
+  display: flex;
+  justify-content: space-between;
+  .prices {
     h2 {
       font-size: 30px;
       color: #000000;
@@ -234,5 +288,19 @@ export default {
       margin: 0 0 3px 0;
     }
   }
-
+  .calender {
+    text-align: left;
+    button {
+      font-size: 16px;
+      color: #FFFFFF;
+      letter-spacing: 1.67px;
+      text-align: center;
+      background: #575757;
+      border: none;
+      padding: 10px 25px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+  }
+}
 </style>

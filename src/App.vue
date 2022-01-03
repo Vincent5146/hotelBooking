@@ -1,18 +1,22 @@
 <template>
   <Loading v-if="isLoading" />
+  <Modal v-if="currentModal" :componentName="currentModal" />
   <router-view/>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import Loading from '@/components/Loading.vue'
+import Modal from '@/components/ModalMain.vue'
 
 export default {
   components: {
-    Loading
+    Loading,
+    Modal
   },
   computed: {
-    ...mapState('loading', ['isLoading'])
+    ...mapState('loading', ['isLoading']),
+    ...mapState('modal', ['currentModal'])
   }
 }
 </script>
