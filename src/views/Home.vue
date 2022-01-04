@@ -4,12 +4,12 @@
       <div class="logo"></div>
       <div class="contactInfo">
         <div class="socialMedia">
-          <a href="#"
-            ><span><i class="fab fa-facebook-square"></i></span
-          ></a>
-          <a href="#"
-            ><span><i class="fab fa-instagram"></i></span
-          ></a>
+          <a href="#">
+            <span><i class="fab fa-facebook-square"></i></span>
+          </a>
+          <a href="#">
+            <span><i class="fab fa-instagram"></i></span>
+          </a>
         </div>
         <div class="info">
           <div>
@@ -124,7 +124,7 @@ export default {
     }
     .info {
       border-left: 3px solid #fff;
-      padding: 0 30px;
+      padding-left: 30px;
       div {
         font-size: 22px;
         color: #ffffff;
@@ -141,7 +141,6 @@ export default {
   position: relative;
   top: -200px;
   ul {
-    margin: 0 20px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -153,6 +152,89 @@ export default {
       margin: 20px 50px;
       background: #f7f7f7;
       box-shadow: 2px 2px 9px 0 rgba(0, 0, 0, 0.18);
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .header {
+    padding: 100px 0 300px 0;
+    height: 400px;
+    .logo {
+      margin-bottom: 130px;
+      width: 180px;
+      height: 180px;
+    }
+    .contactInfo {
+      .socialMedia {
+        display: flex;
+        align-items: center;
+        span {
+          font-size: 30px;
+          color: #f7f7f7;
+          padding: 8px;
+          border-bottom: 3px solid transparent;
+        }
+      }
+      .info {
+        div {
+          span {
+          }
+        }
+      }
+    }
+  }
+  .roomList {
+    ul {
+      li {
+        height: 300px;
+        width: 30%;
+        margin-bottom: 50px;
+      }
+    }
+  }
+}
+@media (max-width: 600px) {
+  .header {
+    padding: 200px 0 300px 0;
+    height: 260px;
+    flex-direction: column;
+    .logo {
+      margin-bottom: 0px;
+      width: 130px;
+      height: 130px;
+    }
+    .contactInfo {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      top: 40px;
+      .socialMedia {
+        margin: 0 0 10px 20px;
+        span {
+          color: rgb(94, 92, 92);
+        }
+      }
+      .info {
+        border-left: none;
+        div {
+          font-size: 14px;
+          color: rgb(94, 92, 92);
+          span {
+            font-size: 16px;
+            color: brgb(94, 92, 92);
+          }
+        }
+      }
+    }
+  }
+  .roomList {
+    ul {
+      li {
+        height: 300px;
+        width: 100%;
+        margin-bottom: 50px;
+      }
     }
   }
 }

@@ -53,7 +53,6 @@ export default {
     }
   }
   .picture {
-    background: url(https://images.unsplash.com/photo-1515511856280-7b23f68d2996?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1953&q=80);
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
@@ -102,5 +101,32 @@ export default {
       }
     }
   }
+}
+@media (max-width: 991px) {
+  .roomInfo {
+    h2 {
+      font-size: 15px;
+    }
+    .prices {
+      h3 {
+        text-align: start;
+        font-size: 10px;
+        letter-spacing: 1.25px;
+        margin-bottom: 40px;
+      }
+      h1 {
+        font-size: 21px;
+        letter-spacing: 2px;
+        span {
+          font-size: 12px;
+          letter-spacing: 1.25px;
+        }
+        .wday {
+        }
+      }
+    }
+  }
+}
+@media (max-width: 600px) {
 }
 </style>

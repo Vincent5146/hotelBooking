@@ -66,11 +66,7 @@
             :modelValue="range"
             @drag="(val) => handleSelect(val)"
             is-range
-            :disabled-dates="[
-              new Date(booking[0]),
-              new Date(booking[1]),
-              new Date(booking[2])
-            ]"
+            :disabled-dates="disabledDates"
           />
           <button @click="handleModal('ModalBooking')">預約時段</button>
         </div>
@@ -92,10 +88,11 @@ export default {
       index: 0,
       date: {},
       range: {
-        start: new Date(),
-        end: new Date()
+        start: '',
+        end: ''
       },
-      booking: {}
+      bookingDays: 0,
+      disabledDates: []
     }
   },
   methods: {
@@ -111,8 +108,10 @@ export default {
     handleHide () {
       this.visible = false
     },
-    handleSelect (val) {
-      const { start, end } = val
+    handleSelect (value) {
+      const { start, end } = value
+      this.bookingDays = parseInt(Math.abs(end - start) / 1000 / 60 / 60 / 24) + 1
+      console.log(this.bookingDays)
       if (new Date(start) === new Date(end)) {
         this.range = {}
         console.log('----')
@@ -127,12 +126,9 @@ export default {
       const response = await getInformation(this.$route.params.room_id)
       this.room = response.data.room
       this.booking = response.data.booking
-      const copy = []
-      this.booking.forEach(function (item) {
-        copy.push(item.date)
+      this.disabledDates = this.booking.map(function (date) {
+        return date.date
       })
-      this.booking = Object.assign({}, copy)
-      console.log(this.booking)
     } catch (error) {
       console.warn(error)
     } finally {

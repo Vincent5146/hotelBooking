@@ -53,6 +53,7 @@ export default {
       bookingRoom(id, data).then((response) => {
         if (response.data.success) {
           this.$store.dispatch('modal/handleModal', 'ModalSuccess')
+          console.log(response.data)
         } else {
           this.$store.dispatch('modal/handleModal', 'ModalError')
         }
