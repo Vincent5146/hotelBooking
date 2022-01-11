@@ -39,18 +39,14 @@
           </div>
         </div>
         <div class="icons">
-          <div class="fonts" :class="{ active: item.amenities['Wi-Fi'] }"><img src="../assets/info/wifi.svg" alt="">Wi-Fi</div>
-          <div class="fonts" :class="{ active: item.amenities['Television'] }"><img src="../assets/info/phone.svg" alt="">電話</div>
-          <div class="fonts" :class="{ active: item.amenities['Great-View'] }"><img src="../assets/info/mountain-range.svg" alt="">漂亮的視野</div>
-          <div class="fonts" :class="{ active: item.amenities.Breakfast }"><img src="../assets/info/breakfast.svg" alt="">早餐</div>
-          <div class="fonts" :class="{ active: item.amenities['Air-Conditioner'] }"><img src="../assets/info/breeze.svg" alt="">空調</div>
-          <div class="fonts" :class="{ active: item.amenities['Smoke-Free'] }"><img src="../assets/info/no-smoke-symbol.svg" alt="">禁止吸菸</div>
-          <div class="fonts" :class="{ active: item.amenities['Mini-Bar'] }"><img src="../assets/info/bar.svg" alt="">Mini Bar</div>
-          <div class="fonts" :class="{ active: item.amenities['Refrigerator'] }"><img src="../assets/info/wifi.svg" alt="">冰箱</div>
-          <div class="fonts" :class="{ active: item.amenities['Child-Friendly'] }"><img src="../assets/info/crawling-baby-silhouette.svg" alt="">適合兒童</div>
-          <div class="fonts" :class="{ active: item.amenities['Room-Service'] }"><img src="../assets/info/room_service.svg" alt="">Room Service</div>
-          <div class="fonts" :class="{ active: item.amenities.Sofa }"><img src="../assets/info/wifi.svg" alt="">沙發</div>
-          <div class="fonts" :class="{ active: item.amenities['Pet-Friendly'] }"><img src="../assets/info/dog.svg" alt="">寵物攜帶</div>
+          <IconImage
+            v-for="(icon, index) in icons"
+            class="fonts"
+            :key="index"
+            :iconType="icon.type"
+            :isActive="icon.isActive"
+            :label="icon.label"
+          />
         </div>
       </div>
       <div class="date">
@@ -62,13 +58,10 @@
         </div>
         <div class="calender">
           <v-date-picker
-            style="width: 80%"
-            :modelValue="range"
-            @drag="(val) => handleSelect(val)"
-            is-range
+            :modelValue="Date.now()"
             :disabled-dates="disabledDates"
           />
-          <button @click="handleModal('ModalBooking')">預約時段</button>
+          <button @click="openBookingModal()">預約時段</button>
         </div>
       </div>
     </div>
@@ -78,8 +71,27 @@
 <script>
 import { mapActions } from 'vuex'
 import { getInformation } from '../api/index'
+import IconImage, { ICON_TYPE } from '@/components/IconImage.vue'
+
+const icons = [
+  { label: 'Wi-Fi', type: ICON_TYPE.WIFI, isActive: false },
+  { label: '電話', type: ICON_TYPE.TEL, isActive: false },
+  { label: '漂亮的視野', type: ICON_TYPE.VIEW, isActive: false },
+  { label: '早餐', type: ICON_TYPE.BREAKFAST, isActive: false },
+  { label: '空調', type: ICON_TYPE.AIR_CONDITIONER, isActive: false },
+  { label: '禁止吸菸', type: ICON_TYPE.SMOKE_FREE, isActive: false },
+  { label: 'Mini', type: ICON_TYPE.BAR, isActive: false },
+  { label: '冰箱', type: ICON_TYPE.BREAKFAST, isActive: false },
+  { label: '適合兒童', type: ICON_TYPE.CHILD_FRIENDLY, isActive: false },
+  { label: 'Room', type: ICON_TYPE.ROOM_SERVICE, isActive: false },
+  { label: '沙發', type: ICON_TYPE.WIFI, isActive: false },
+  { label: '寵物攜帶', type: ICON_TYPE.PET, isActive: false }
+]
 
 export default {
+  components: {
+    IconImage
+  },
   data () {
     return {
       room: [],
@@ -92,39 +104,44 @@ export default {
         end: ''
       },
       bookingDays: 0,
-      disabledDates: []
+      disabledDates: [],
+      ICON_TYPE,
+      icons
     }
   },
   methods: {
     showMultiple () {
       this.imgs = this.room
-
       this.index = 0
-      this.show()
+      this.handleLightBox(true)
     },
-    show () {
-      this.visible = true
+    handleLightBox (showStatus) {
+      this.visible = showStatus
     },
-    handleHide () {
-      this.visible = false
-    },
-    handleSelect (value) {
-      const { start, end } = value
-      this.bookingDays = parseInt(Math.abs(end - start) / 1000 / 60 / 60 / 24) + 1
-      console.log(this.bookingDays)
-      if (new Date(start) === new Date(end)) {
-        this.range = {}
-        console.log('----')
-      }
+    openBookingModal () {
+      this.showBookingModal({
+        disabledDates: this.disabledDates,
+        priceInfo: {
+          normal: this.room[0].normalDayPrice,
+          holiday: this.room[0].holidayPrice
+        }
+      })
     },
     ...mapActions('loading', ['handleLoading']),
-    ...mapActions('modal', ['handleModal'])
+    ...mapActions('modal', ['handleModal', 'showBookingModal'])
   },
   async mounted () {
     try {
       this.handleLoading(true)
       const response = await getInformation(this.$route.params.room_id)
       this.room = response.data.room
+      const amenities = this.room[0].amenities
+      this.icons = this.icons.map((icon) => {
+        return {
+          ...icon,
+          isActive: amenities[icon.type]
+        }
+      })
       this.booking = response.data.booking
       this.disabledDates = this.booking.map(function (date) {
         return date.date

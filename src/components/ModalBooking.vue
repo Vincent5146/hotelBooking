@@ -3,20 +3,32 @@
     <div class="booking">
       <h1>預約時段</h1>
       <p>\</p>
-      <div>
+      <div class="cutomerInfo">
         <h2>姓名</h2><input type="text" v-model="data.name">
       </div>
-      <div>
+      <div class="cutomerInfo">
         <h2>電話</h2><input type="text" v-model="data.tel">
       </div>
-      <div>
-        <h2>預約起迄</h2><input type="date" v-model="data.date[0]">~<input type="date" v-model="data.date[1]">
+      <div class="cutomerInfo">
+        <h2>預約起訖</h2>
+        <v-date-picker
+          v-model="range"
+          mode="date"
+          is-range
+          :disabled-dates="bookingConfigs.disabledDates"
+          @click="counting()"
+        >
+          <template v-slot="{ inputValue, inputEvents }">
+            <input :value="inputValue.start" v-on="inputEvents.start" />
+            <input :value="inputValue.end" v-on="inputEvents.end" />
+          </template>
+        </v-date-picker>
       </div>
-      <div class="bookingdate">
+      <div class="bookingRange">
         <p>平日時段<br><br>假日時段</p>
-        <p>1夜<br><br>1夜</p>
+        <p>{{ this.normalDate.length }}夜<br><br>{{ holidayNight }}夜</p>
       </div>
-      <h3><span>=</span>NT.2850</h3>
+      <h3><span class="price">=</span>NT. {{ totalPrice }}</h3>
       <div class="btn">
         <button class="delete" @click="handleModal(null)">取消</button>
         <button class="confirm" @click="bookings(data)">確定預約</button>
@@ -27,8 +39,9 @@
 
 <script>
 import Modal from './Modal.vue'
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import { bookingRoom } from '../api/index'
+import dayjs from 'dayjs'
 
 export default {
   name: 'ModalBooking',
@@ -40,24 +53,70 @@ export default {
       data: {
         name: '',
         tel: '',
-        date: [
-          0,
-          1
-        ]
-      }
+        date: []
+      },
+      range: {
+        start: new Date(),
+        end: new Date()
+      },
+      totalDate: [],
+      normalDate: [],
+      holidayDate: [],
+      totalPrice: 0,
+      holidayNight: 0
     }
   },
+  computed: {
+    ...mapState('modal', ['bookingConfigs'])
+  },
   methods: {
+    counting () {
+      const { start, end } = this.range
+      if (start !== end) {
+        for (let i = 0; i <= dayjs(end).diff(start, 'day'); i++) {
+          this.totalDate.push(dayjs(start).add(i, 'day').format('YYYY/MM/DD'))
+        }
+      } else if (start === end) {
+        this.totalDate.push(dayjs(start).format('YYYY/MM/DD'))
+      }
+      this.totalDate = this.totalDate.map(function (item) {
+        item = new Date(item).getDay()
+        return item
+      })
+      this.normalDate = this.totalDate.filter(item => {
+        if (item < 6 && item > 0) {
+          this.normalDate.push(item)
+          return item
+        }
+      })
+      this.holidayDate = this.totalDate.filter(item => {
+        if (item > 5) {
+          this.holidayDate.push(item)
+          return item
+        }
+      })
+      this.totalPrice = (this.bookingConfigs.priceInfo.normal * this.normalDate.length) + (this.bookingConfigs.priceInfo.holiday * (this.totalDate.length - this.normalDate.length - 1))
+      this.holidayNight = (this.totalDate.length - this.normalDate.length - 1)
+      this.totalDate = []
+    },
     bookings (data) {
       const id = this.$route.params.room_id
+      const { start, end } = this.range
+      if (start !== end) {
+        for (let i = 0; i <= dayjs(end).diff(start, 'day'); i++) {
+          this.data.date.push(dayjs(start).add(i, 'day').format('YYYY-MM-DD'))
+        }
+      } else if (start === end) {
+        this.data.date.push(dayjs(start).format('YYYY-MM-DD'))
+      }
       bookingRoom(id, data).then((response) => {
         if (response.data.success) {
           this.$store.dispatch('modal/handleModal', 'ModalSuccess')
-          console.log(response.data)
         } else {
           this.$store.dispatch('modal/handleModal', 'ModalError')
         }
       })
+      this.totalDate = []
     },
     ...mapActions('modal', ['handleModal'])
   }
@@ -78,12 +137,13 @@ export default {
     p {
       margin-bottom: 20px;
     }
-    div {
+    .cutomerInfo {
       display: flex;
       align-content: center;
       justify-content: space-between;
       margin-bottom: 10px;
       h2 {
+        width: 150px;
         font-weight: bold;
         font-size: 14px;
         color: #000000;
@@ -94,7 +154,7 @@ export default {
         border-radius: 5px;
       }
     }
-    span {
+    .price {
       margin-right: 30px;
     }
     h3 {
@@ -104,7 +164,7 @@ export default {
       text-align: right;
       margin: 10px 0 30px;
     }
-    .bookingdate {
+    .bookingRange {
       width: 100%;
       background-color: #EDEDED;
       display: flex;
@@ -119,6 +179,8 @@ export default {
       }
     }
     .btn {
+      display: flex;
+      justify-content: space-between;
       .delete {
         background: #D8D8D8;
         border: none;
