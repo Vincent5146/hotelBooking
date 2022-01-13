@@ -58,6 +58,7 @@
         </div>
         <div class="calender">
           <v-date-picker
+            class="picker"
             :modelValue="Date.now()"
             :disabled-dates="disabledDates"
           />
@@ -303,6 +304,9 @@ export default {
   }
   .calender {
     text-align: left;
+    .picker{
+      width: 80%;
+    }
     button {
       font-size: 16px;
       color: #FFFFFF;

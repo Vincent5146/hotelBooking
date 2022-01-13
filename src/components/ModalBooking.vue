@@ -26,7 +26,7 @@
       </div>
       <div class="bookingRange">
         <p>平日時段<br><br>假日時段</p>
-        <p>{{ this.normalDate.length }}夜<br><br>{{ holidayNight }}夜</p>
+        <p>{{ this.normalDate.length }}夜<br><br>{{ this.holidayDate.length }}夜</p>
       </div>
       <h3><span class="price">=</span>NT. {{ totalPrice }}</h3>
       <div class="btn">
@@ -60,10 +60,10 @@ export default {
         end: new Date()
       },
       totalDate: [],
+      realDate: [],
       normalDate: [],
       holidayDate: [],
-      totalPrice: 0,
-      holidayNight: 0
+      totalPrice: 0
     }
   },
   computed: {
@@ -83,20 +83,14 @@ export default {
         item = new Date(item).getDay()
         return item
       })
+      this.totalDate.splice(0, 1)
       this.normalDate = this.totalDate.filter(item => {
-        if (item < 6 && item > 0) {
-          this.normalDate.push(item)
-          return item
-        }
+        return item < 6 && item > 0
       })
       this.holidayDate = this.totalDate.filter(item => {
-        if (item > 5) {
-          this.holidayDate.push(item)
-          return item
-        }
+        return !(item < 6 && item > 0)
       })
-      this.totalPrice = (this.bookingConfigs.priceInfo.normal * this.normalDate.length) + (this.bookingConfigs.priceInfo.holiday * (this.totalDate.length - this.normalDate.length - 1))
-      this.holidayNight = (this.totalDate.length - this.normalDate.length - 1)
+      this.totalPrice = (this.bookingConfigs.priceInfo.normal * this.normalDate.length) + (this.bookingConfigs.priceInfo.holiday * this.holidayDate.length)
       this.totalDate = []
     },
     bookings (data) {
