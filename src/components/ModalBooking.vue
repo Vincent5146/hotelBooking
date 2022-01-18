@@ -60,7 +60,6 @@ export default {
         end: new Date()
       },
       totalDate: [],
-      realDate: [],
       normalDate: [],
       holidayDate: [],
       totalPrice: 0
